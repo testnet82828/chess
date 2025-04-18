@@ -2,3 +2,4 @@
 streamlit==1.44.1
 python-chess==1.999
 stchess==0.0.1
+firebase-admin==6.5.0
