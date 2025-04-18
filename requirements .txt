@@ -1,1 +1,2 @@
-streamlit python-chess stchess
+
+streamlit==1.39.0 python-chess==1.999 stchess==0.0.4
