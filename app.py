@@ -11,8 +11,8 @@ if 'game_over' not in st.session_state:
     st.session_state.game_over = False
 if 'status_message' not in st.session_state:
     st.session_state.status_message = ""
-if 'chess_move' not in st.session_state:
-    st.session_state.chess_move = None
+if 'last_move' not in st.session_state:
+    st.session_state.last_move = None
 
 # Streamlit app title
 st.title("Simple Chess Game")
@@ -38,12 +38,11 @@ chessboard_html = f"""
 </script>
 """
 
-# Render chessboard.js component with a unique key
-components.html(chessboard_html, height=450, width=450, key="chessboard")
+# Render chessboard.js component
+move = components.html(chessboard_html, height=450, width=450)
 
 # Handle moves from the component
-move = st.session_state.get("chessboard")
-if move and not st.session_state.game_over:
+if move and not st.session_state.game_over and move != st.session_state.last_move:
     try:
         # Convert move from chessboard.js format (e.g., "e2-e4") to UCI (e.g., "e2e4")
         move_uci = move.replace("-", "")
@@ -67,15 +66,15 @@ if move and not st.session_state.game_over:
                     st.session_state.status_message = "Game over: Draw."
             else:
                 st.session_state.status_message = ""
-            # Clear the move to prevent reprocessing
-            st.session_state.chess_move = None
+            # Store the move to prevent reprocessing
+            st.session_state.last_move = move
             st.rerun()
         else:
             st.session_state.status_message = "Illegal move! Try again."
-            st.session_state.chess_move = None
+            st.session_state.last_move = move
     except ValueError:
         st.session_state.status_message = "Invalid move format! Try again."
-        st.session_state.chess_move = None
+        st.session_state.last_move = move
 
 # Display game status or error messages
 if st.session_state.status_message:
@@ -87,7 +86,7 @@ if st.button("Reset Game"):
     st.session_state.player_turn = True
     st.session_state.game_over = False
     st.session_state.status_message = ""
-    st.session_state.chess_move = None
+    st.session_state.last_move = None
     st.rerun()
 
 # Display current board FEN (for debugging)
