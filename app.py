@@ -20,21 +20,28 @@ st.title("Simple Chess Game")
 if not st.session_state.game_over:
     st.write(f"**Turn**: {'White' if st.session_state.player_turn else 'Black'}")
 
-# JavaScript for chessboard.js with hidden input
+# JavaScript for chessboard.js with error logging
 chessboard_html = f"""
 <link rel="stylesheet" href="https://unpkg.com/chessboard-js@1.0.0/css/chessboard-1.0.0.min.css">
 <script src="https://unpkg.com/chessboard-js@1.0.0/js/chessboard-1.0.0.min.js"></script>
 <div id="board" style="width: 400px; margin: auto;"></div>
 <input type="hidden" id="move-input" value="">
+<div id="error-message" style="color: red; text-align: center;"></div>
 <script>
-    var board = Chessboard('board', {{
-        position: '{st.session_state.board.fen()}',
-        draggable: true,
-        onDrop: function(source, target) {{
-            var move = source + '-' + target;
-            document.getElementById('move-input').value = move;
-        }}
-    }});
+    try {{
+        var board = Chessboard('board', {{
+            position: '{st.session_state.board.fen()}',
+            draggable: true,
+            onDrop: function(source, target) {{
+                var move = source + '-' + target;
+                document.getElementById('move-input').value = move;
+            }}
+        }});
+        document.getElementById('error-message').innerText = '';
+    }} catch (e) {{
+        document.getElementById('error-message').innerText = 'Error loading chessboard: ' + e.message;
+        console.error('Chessboard.js error:', e);
+    }}
 </script>
 <style>
     #move-input {{ display: none; }}
@@ -107,4 +114,5 @@ st.markdown("""
 - **Game End**: The game ends on checkmate, stalemate, or draw.
 - **Reset**: Click "Reset Game" to start a new game.
 - **Local Play**: Two players can take turns on the same device (White vs. Black).
+- **Troubleshooting**: If the board doesn't display, check the browser console (F12 → Console) for errors and report them.
 """)
